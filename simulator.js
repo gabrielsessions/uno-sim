@@ -60,7 +60,7 @@ class Deck {
 }
 
 class UnoGame {
-    constructor(playerCount) {
+    constructor(playerCount, speed) {
         this.deck = new Deck();
         this.players = Array.from({ length: playerCount }, () => ({ hand: [] }));
         this.discardPile = [];
@@ -68,6 +68,7 @@ class UnoGame {
         this.direction = 1; // 1 for clockwise, -1 for counterclockwise
         this.gameOver = false;
         this.estTime = 0;
+        this.speed = speed;
 
         this.start();
     }
@@ -83,7 +84,7 @@ class UnoGame {
     }
 
     playCard(playerIndex, cardIndex) {
-        this.estTime += 5;
+        this.estTime += 6
         const player = this.players[playerIndex];
         const card = player.hand.splice(cardIndex, 1)[0];
         const nextPlayer = (this.currentPlayer + this.direction + this.players.length) % this.players.length
@@ -145,11 +146,11 @@ class UnoGame {
     }
 
     drawCard(playerIndex) {
-        this.estTime += 2;
+        this.estTime += 3;
         // Reshuffle if out of cards
         if (this.deck.cards.length === 0) {
             this.deck.cards = [...this.discardPile];
-            this.discardPile = this.deck.cards.pop();
+            this.discardPile = [this.deck.cards.at(-1)];
             
             this.deck.shuffle();
         }
@@ -162,6 +163,7 @@ class UnoGame {
     }
 
     async takeTurn() {
+        await delay(this.speed);
         // Check for matching color first
         const hand = this.players[this.currentPlayer].hand;
         const playableCards = [];
@@ -169,8 +171,6 @@ class UnoGame {
             if (this.playableCard(hand[i])) { playableCards.push({ card: hand[i], index: i }) }
         }
 
-        console.log(this.discardPile.at(-1))
-        console.log(playableCards);
 
         // Choose a card to play if a valid move exists
         if (playableCards.length > 0) {
@@ -188,7 +188,7 @@ class UnoGame {
         // Draw until a valid card is drawn
         while (!this.playableCard(this.players[this.currentPlayer].hand.at(-1))) {
             this.drawCard(this.currentPlayer);
-            await this.delay(250);
+            await this.delay(this.speed/2);
 
         }
         this.playCard(this.currentPlayer, this.players[this.currentPlayer].hand.length - 1);
@@ -196,6 +196,7 @@ class UnoGame {
     }
 
     playableCard(card) {
+        //console.log(this.discardPile);
         return (card.color === "Wild" ||
             card.value === this.discardPile.at(-1).value ||
             card.color === this.discardPile.at(-1).color)

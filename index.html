@@ -13,18 +13,22 @@
             event.preventDefault();
 
             const numPlayersInput = document.getElementById("players").value;
+            const speedInput = parseInt(document.getElementById("speed").value);
+            const timePerTurn = Math.round(4000/(Math.pow(speedInput, 1.5)));
+            console.log(timePerTurn, speedInput);
+
             const numPlayers = numPlayersInput ? numPlayersInput : 4;
             document.getElementById("start-sim").innerHTML = "";
 
-            const game = new UnoGame(numPlayers);
+            const game = new UnoGame(numPlayers, timePerTurn);
 
 
 
             while (!game.gameOver) {
                 showHands(game);
                 showDiscardPile(game);
-                await delay(500);
-                game.takeTurn();
+                
+                await game.takeTurn();
             }
             showHands(game);
             showDiscardPile(game);
@@ -32,6 +36,7 @@
 
         function showDiscardPile(game) {
             const discards = document.getElementById("discard");
+            //console.log(game.discardPile);
             discards.innerText = game.discardPile.at(-1).toString();
         }
 
@@ -64,6 +69,10 @@
     <form onsubmit="simulate(event)" id="start-sim">
         <p>How many players would you like in our simulation?</p>
         <input type="number" id="players">
+        <br> <br>
+        <label for="speed">Simulation Speed:</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="speed">
+        <br><br>
         <button type="submit" onclick="(e) => simulate(e)">Run Simulation</button>
     </form>
 
