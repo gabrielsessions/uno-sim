@@ -67,6 +67,7 @@ class UnoGame {
         this.currentPlayer = 0;
         this.direction = 1; // 1 for clockwise, -1 for counterclockwise
         this.gameOver = false;
+        this.estTime = 0;
 
         this.start();
     }
@@ -82,6 +83,7 @@ class UnoGame {
     }
 
     playCard(playerIndex, cardIndex) {
+        this.estTime += 5;
         const player = this.players[playerIndex];
         const card = player.hand.splice(cardIndex, 1)[0];
         const nextPlayer = (this.currentPlayer + this.direction + this.players.length) % this.players.length
@@ -143,6 +145,7 @@ class UnoGame {
     }
 
     drawCard(playerIndex) {
+        this.estTime += 2;
         // Reshuffle if out of cards
         if (this.deck.cards.length === 0) {
             this.deck.cards = [...this.discardPile];
@@ -174,7 +177,7 @@ class UnoGame {
             // TODO: Add logic to bot choices
             this.playCard(this.currentPlayer, playableCards[0].index);
             if (hand.length < 1) {
-                alert('Game Over!')
+                alert('Game Over! Est playing time is ' + (this.estTime/60) + " minutes")
                 this.gameOver = true;
             }
             return;
