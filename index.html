@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uno Simulator</title>
+    <script src="./simulator.js"></script>
+    <script src="./index.js"></script>
+    <script>
+        async function simulate(event) {
+            // Prevent the form from submitting the traditional way (page reload)
+            event.preventDefault();
+
+            const numPlayersInput = document.getElementById("players").value;
+            const numPlayers = numPlayersInput ? numPlayersInput : 4;
+            document.getElementById("start-sim").innerHTML = "";
+
+            const game = new UnoGame(numPlayers);
+
+
+
+            while (!game.gameOver) {
+                showHands(game);
+                showDiscardPile(game);
+                await delay(500);
+                game.takeTurn();
+            }
+            showHands(game);
+            showDiscardPile(game);
+        }
+
+        function showDiscardPile(game) {
+            const discards = document.getElementById("discard");
+            discards.innerText = game.discardPile.at(-1).toString();
+        }
+
+        function showHands(game) {
+            const playersDiv = document.getElementById("hands");
+            playersDiv.innerHTML = "";
+
+            game.players.forEach((player, index) => {
+                //
+                let newHand = "";
+                player.hand.forEach(card => {
+                    newHand += `${card.toString()}, `
+                });
+                playersDiv.innerHTML += `<p>Player ${index + 1}</p><p style="margin-bottom: 2em;">${newHand}</p>`;
+
+            });
+        }
+
+        async function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Uno Simulator</h1>
+
+    <form onsubmit="simulate(event)" id="start-sim">
+        <p>How many players would you like in our simulation?</p>
+        <input type="number" id="players">
+        <button type="submit" onclick="(e) => simulate(e)">Run Simulation</button>
+    </form>
+
+    <div>
+        <p>Players' Hands</p>
+        <div id="hands">
+
+        </div>
+        <p>Discard Pile</p>
+        <div id="discard">
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
